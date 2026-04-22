@@ -1,0 +1,19 @@
+-- Per-machine config. Copy to lua/config/local.lua (gitignored).
+--
+-- Loaded by init.lua via pcall(require, "config.local") AFTER all
+-- other config modules. Set vim.g.* keys for machine-specific values.
+-- Never commit machine paths, org names, or secrets to tracked Lua.
+--
+-- Schema:
+--   vim.g.project_roots : string[]
+--     Roots scanned by <leader>fp project picker (plugins/fuzzy.lua).
+--     fd searches each at depth 4 for .git directories. Parent dirname
+--     of each match is the project root presented in the fzf list.
+--     Default when unset: { vim.fn.expand("~/src") }
+--
+-- Example:
+--   vim.g.project_roots = {
+--     vim.fn.expand("~/src/work"),
+--     vim.fn.expand("~/src/oss"),
+--     vim.fn.expand("~/src/personal"),
+--   }

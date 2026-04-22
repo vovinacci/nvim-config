@@ -1,0 +1,10 @@
+.DS_Store
+*.swp
+*.swo
+*.bak
+spell/*.add.spl
+
+# lazy-lock.json IS committed - do NOT add it here.
+
+# Per-machine config layer. Tracked template: lua/config/local.lua.example.
+lua/config/local.lua
