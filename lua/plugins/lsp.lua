@@ -48,11 +48,20 @@ local SERVERS = {
       yaml = {
         keyOrdering = false,
         format = { enable = false },
+        -- Disable yamlls' own schemastore fetch -- schemastore.nvim populates
+        -- yaml.schemas in mason-lspconfig config() to avoid double-fetching.
+        schemaStore = { enable = false, url = "" },
       },
     },
   },
   jsonls = {
-    -- TODO 3b: wire b0o/schemastore.nvim for live schema catalog.
+    settings = {
+      json = {
+        -- schemas table populated lazily in mason-lspconfig config() so
+        -- schemastore is loaded only when LSP actually attaches.
+        validate = { enable = true },
+      },
+    },
   },
   bashls = {},
   terraformls = {},
@@ -125,6 +134,7 @@ return {
     dependencies = {
       "mason-org/mason.nvim",
       "neovim/nvim-lspconfig",
+      "b0o/schemastore.nvim",
     },
     config = function()
       require("mason-lspconfig").setup({
@@ -141,8 +151,28 @@ return {
         end,
       })
 
+      -- Capabilities: merge nvim defaults with blink.cmp's enriched set when
+      -- the completion plugin is present. pcall keeps lsp.lua functional if
+      -- completion.lua is removed -- LSP still works, just no completion.
+      local caps = vim.lsp.protocol.make_client_capabilities()
+      local ok_blink, blink = pcall(require, "blink.cmp")
+      if ok_blink then
+        caps = blink.get_lsp_capabilities(caps, false)
+      end
+
+      -- Schemastore catalogs -- lazy-loaded here so the heavy module loads
+      -- only when LSP actually engages, not at plugin spec time.
+      local ok_ss, schemastore = pcall(require, "schemastore")
+      if ok_ss then
+        SERVERS.jsonls.settings = SERVERS.jsonls.settings or {}
+        SERVERS.jsonls.settings.json = SERVERS.jsonls.settings.json or {}
+        SERVERS.jsonls.settings.json.schemas = schemastore.json.schemas()
+        SERVERS.yamlls.settings.yaml.schemas = schemastore.yaml.schemas()
+      end
+
       -- v2 API: vim.lsp.config + vim.lsp.enable. Not setup_handlers (legacy).
       for name, cfg in pairs(SERVERS) do
+        cfg.capabilities = caps
         vim.lsp.config(name, cfg)
         vim.lsp.enable(name)
       end

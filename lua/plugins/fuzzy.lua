@@ -68,6 +68,8 @@ return {
       { "<leader>fw", function() require("fzf-lua").grep_cword() end, desc = "Grep word" },
       { "<leader>fd", function() require("fzf-lua").diagnostics_workspace() end, desc = "Diagnostics" },
       { "<leader>fp", project_picker, desc = "Projects" },
+      { "<leader>fs", function() require("fzf-lua").lsp_document_symbols() end, desc = "Document symbols" },
+      { "<leader>fS", function() require("fzf-lua").lsp_live_workspace_symbols() end, desc = "Workspace symbols" },
     },
     opts = {
       defaults = {
