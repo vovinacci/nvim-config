@@ -51,6 +51,7 @@ local AUX_FT = {
   ["neo-tree-popup"] = true,
   qf = true,
   help = true,
+  Outline = true,        -- punch-list #42: outline.nvim sidebar (Phase 3a)
 }
 local function is_aux_buf(buf)
   if AUX_FT[vim.bo[buf].filetype] then return true end
